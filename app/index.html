@@ -44,9 +44,30 @@
 	</script>
 
 	<script type='text/x-handlebars' data-template-name='contact'>
-		<h1 class="jumbotron">
+		<h2 class="jumbotron">
 			contact!
-		</h1>
+		</h2>
+		
+		{{#each model}}
+			<dl class="dl-horizontal">
+				<dt>Name</dt>
+				<dd>{{name}}</dd>
+				<dt>Phone Number</dt>
+				<dd>{{number}}</dd>
+			</dl>
+		{{/each}}
+	</script>
+
+	<script type='text/x-handlebars' data-template-name='login'>
+
+		<form class="form-inline" {{action login on="submit"}}>
+		{{input value=username type="text" placeholder="username"}}
+		{{input value=password type="password" placeholder="password"}}
+		{{input class="btn" type="submit" value="log in"}}
+
+		{{#if errorMessage}}
+			<div class="alert alert-danger">{{errorMessage}}</div>
+		{{/if}}
 	</script>
 
 	<script type='text/x-handlebars' data-template-name='loading'>
