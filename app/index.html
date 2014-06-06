@@ -13,6 +13,7 @@
 				<div class="navbar-header">
 					<a href="#" class="navbar-brand">Brand</a>
 				</div>
+				{{partial "login"}}
 				<ul class="nav navbar-nav navbar-right">
 					{{#link-to 'home' tagName='li'}}
 						<a href="#">home <span class="glyphicon glyphicon-home"></span></a>
@@ -23,7 +24,7 @@
 					{{#link-to 'contact' tagName='li'}}
 						<a href="#">contact <span class="glyphicon glyphicon-phone-alt"></span></a>
 					{{/link-to}}
-				</ul>			
+				</ul>
 			</div>			
 		</nav>
 		<div class="container">
@@ -72,6 +73,18 @@
 
 	<script type='text/x-handlebars' data-template-name='loading'>
 		loading…
+	</script>
+
+	<script type='text/x-handlebars' data-template-name='_login'>
+		{{#if authenticated}}
+			{{#link-to 'logout' class='btn btn-default navbar-btn'}}
+				sign out <span class="glyphicon glyphicon-off"></span>
+			{{/link-to}}
+		{{else}}
+			{{#link-to 'login' class='btn btn-default navbar-btn'}}
+				sign in <span class="glyphicon glyphicon-thumbs-up"></span>
+			{{/link-to}}
+		{{/if}}
 	</script>
 
 	<script src="js/jquery/dist/jquery.min.js"></script>

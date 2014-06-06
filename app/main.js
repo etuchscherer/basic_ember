@@ -5,6 +5,7 @@ App.Router.map(function() {
 	this.resource('about', { path: '/about' });
 	this.resource('contact', { path: '/contact' });
 	this.resource('login', { path: '/login' });
+	this.resource('logout', { path: '/logout' });
 
 });
 
@@ -14,15 +15,23 @@ App.LoginRoute = Ember.Route.extend({
 	}
 });
 
+App.LogoutRoute = Ember.Route.extend({
+	setupController: function(controller, context) {
+		controller.destroySession();
+		this.controllerFor('application').set('authenticated', false);
+		this.transitionTo('home');
+	}
+});
+
 App.AuthenticatedRoute = Ember.Route.extend({
 	beforeModel: function(transition) {
-		if (!this.controllerFor('login').get('token')) {
+		if (!this.controllerFor('application').get('token')) {
 			this.redirectToLogin(transition);
 		}
 	},
 
 	getJSONWithToken: function(url) {
-		return $.getJSON(url, { token: this.controllerFor('login').get('token') });
+		return $.getJSON(url, { token: this.controllerFor('application').get('token') });
 	},
 
 	redirectToLogin: function(transition) {
@@ -38,7 +47,8 @@ App.AuthenticatedRoute = Ember.Route.extend({
 				this.loginRequired();
 				this.redirectToLogin(transition);
 			} else {
-				console.error('something went wrong');
+				console.error('something went wrong, try `sessionStorage.clear()`, and reload.');
+				this.transitionTo('home');
 			}
 		}
 	}
@@ -50,7 +60,18 @@ App.ContactRoute = App.AuthenticatedRoute.extend({
 	}
 });
 
+App.ApplicationController = Ember.Controller.extend({
+	authenticated: false
+});
+
+App.LogoutController = Ember.Controller.extend({
+	destroySession: function() {
+		sessionStorage.clear();
+	}
+});
+
 App.LoginController = Ember.Controller.extend({
+	needs: "application",
 
 	reset: function() {
 		this.setProperties({
@@ -60,11 +81,11 @@ App.LoginController = Ember.Controller.extend({
 		});
 	},
 
-	token: localStorage.token,
+	// token: sessionStorage.token,
 
 	tokenChanged: function() {
-		localStorage.token = this.get('token');
-	}.observes('token'),
+		sessionStorage.token = this.get('controllers.application.token');
+	}.observes('controllers.application.token'),
 
 	actions: {
 		login: function() {
@@ -78,14 +99,20 @@ App.LoginController = Ember.Controller.extend({
 				self.set('errorMessage', r.message);
 
 				if (r.success) {
+
+					self.set('controllers.application.token', r.token);
+					self.set('controllers.application.authenticated', true);
+
 					if (attemptedTransition) {
+
 						attemptedTransition.retry();
+
 						self.set('attemptedTransition', null);
+
 					} else {	// transition to contact by default
+
 						self.transitionToRoute('contact');	
 					}
-					self.set('token', r.token);
-
 				}
 			});
 		}
