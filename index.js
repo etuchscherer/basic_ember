@@ -21,7 +21,7 @@ app.get('/data.json', function(req, res) {
 });
 
 app.use('/', express.static(__dirname + '/app'));
-app.use('/js', express.static(__dirname + '/bower_components'));
+app.use('/js', express.static(__dirname + '/app/bower_components'));
 
 app.post('/auth.json', function(req, res) {
 
